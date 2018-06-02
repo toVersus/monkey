@@ -19,7 +19,7 @@ func TestNextToken(t *testing.T) {
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
 		{token.RBRACE, "}"},
-		{token.COMMA, "."},
+		{token.COMMA, ","},
 		{token.SEMICOLON, ";"},
 	}
 
@@ -34,9 +34,9 @@ func TestNextToken(t *testing.T) {
 				i, test.wantType, tok.Type)
 		}
 
-		if tok.wantLiteral != test.wantLiteral {
+		if tok.Literal != test.wantLiteral {
 			t.Fatalf("tests[%d] - wrong literal. want=%q, got=%q",
-				i, test.wantLiteral, tok.literal)
+				i, test.wantLiteral, tok.Literal)
 		}
 	}
 }
