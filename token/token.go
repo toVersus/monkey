@@ -18,6 +18,20 @@ const (
 	// PLUS represents to add left and right side of operator.
 	// It is commonly known as infix notation.
 	PLUS = "+"
+	// MINUS represents to subtract left and right side of operator.
+	// It is commonly known as infix notation.
+	MINUS = "-"
+	// BANG represents logically "not" operator.
+	BANG = "!"
+	// ASTERISK represents multiplication.
+	ASTERISK = "*"
+	// SLASH represents division remainder.
+	SLASH = "/"
+
+	// LT represents "less than".
+	LT = "<"
+	// GT represents "greater than".
+	GT = ">"
 
 	// COMMA is delimiter to separate multiple values.
 	COMMA = ","
