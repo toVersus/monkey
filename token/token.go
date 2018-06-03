@@ -50,3 +50,17 @@ type Token struct {
 	Type    TokenType
 	Literal string
 }
+
+// keywords is the table of reserved keywords in language and its tokentype.
+var keywords = map[string]TokenType{
+	"fn":  FUNCTION,
+	"let": LET,
+}
+
+// LookupIdent checks whether the given identifier is a reserved keyword or user-defined identifier.
+func LookupIdent(ident string) TokenType {
+	if tok, ok := keywords[ident]; ok {
+		return tok
+	}
+	return IDENT
+}

@@ -48,6 +48,8 @@ func New(input string) *Lexer {
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
+	l.skipWhitespace()
+
 	// TODO: Consider to replace the branching method from switch to map.
 	switch l.ch {
 	case '=':
@@ -69,13 +71,70 @@ func (l *Lexer) NextToken() token.Token {
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
+	default:
+		if isLetter(l.ch) {
+			tok.Literal = l.readIdentifier()
+			tok.Type = token.LookupIdent(tok.Literal)
+			return tok
+		} else if isDigit(l.ch) {
+			tok.Literal = l.readNumber()
+			tok.Type = token.INT
+			return tok
+		}
+		// If reaching end of this block, the current char cannot be handled.
+		tok = newToken(token.ILLEGAL, l.ch)
 	}
 
 	l.readChar()
 	return tok
 }
 
+// readIdentifier reads in an identifier and advances lexer's position
+// until it encounters a non-letter char.
+func (l *Lexer) readIdentifier() string {
+	position := l.position
+	for isLetter(l.ch) {
+		l.readChar()
+	}
+	return l.input[position:l.position]
+}
+
+// isLetter is helper function to check whether the given argument is a letter or not.
+// Changes to this function will heavily impact on the language itself.
+// Currently, snake case representation is supported for the identifier and keyword,
+// but both '!' and '?' are not recognized as identifier.
+func isLetter(ch byte) bool {
+	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
+}
+
 // nextToken initializes the token passing through.
 func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
+}
+
+// skipWhitespace skips over whitespace, tabspace and newline.
+// This rule depends on the language being lexed.
+func (l *Lexer) skipWhitespace() {
+	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
+		l.readChar()
+	}
+}
+
+// readNumber reads in an identifier and advances lexer's positionuntil it encounters a non-numeric char.
+// readNumber is almost same implementation as readIdentifier except for its usage of isDigit instead of isLetter.
+// But, for simplicity and ease of understanding, these two function are not generalize
+// by passing in the char-idenrifying function as arguments.
+func (l *Lexer) readNumber() string {
+	position := l.position
+	for isDigit(l.ch) {
+		l.readChar()
+	}
+	return l.input[position:l.position]
+}
+
+// isDigit is helper function to check whether the given argument is integer or not.
+// This means that it doesn't support float, numbers in hex and octal notation in this stage.
+// TODO: Support float or other digit format.
+func isDigit(ch byte) bool {
+	return '0' <= ch && ch <= '9'
 }
