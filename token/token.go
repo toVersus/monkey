@@ -48,7 +48,12 @@ const (
 	// and also can take other functions as arguments (higher order functions).
 	FUNCTION = "FUNCTION"
 	// LET binds the value (left side of '=' operator) to the name (right side of '=' operator).
-	LET = "LET"
+	LET    = "LET"
+	TRUE   = "TRUE"
+	FALSE  = "FALSE"
+	IF     = "IF"
+	ELSE   = "ELSE"
+	RETURN = "RETURN"
 )
 
 // TokenType is used to distinguish between different type of tokens.
@@ -67,8 +72,13 @@ type Token struct {
 
 // keywords is the table of reserved keywords in language and its tokentype.
 var keywords = map[string]TokenType{
-	"fn":  FUNCTION,
-	"let": LET,
+	"fn":     FUNCTION,
+	"let":    LET,
+	"true":   TRUE,
+	"false":  FALSE,
+	"if":     IF,
+	"else":   ELSE,
+	"return": RETURN,
 }
 
 // LookupIdent checks whether the given identifier is a reserved keyword or user-defined identifier.
