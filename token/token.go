@@ -33,6 +33,9 @@ const (
 	// GT represents "greater than".
 	GT = ">"
 
+	EQ    = "=="
+	NOTEQ = "!="
+
 	// COMMA is delimiter to separate multiple values.
 	COMMA = ","
 	// SEMICOLON is delimiter to represent the end of statement.

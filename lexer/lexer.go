@@ -54,12 +54,28 @@ func (l *Lexer) NextToken() token.Token {
 	switch l.ch {
 	case '=':
 		tok = newToken(token.ASSIGN, l.ch)
+		// Token will be updated when detecting "==" tokens.
+		// The following process will be abstracted when supporting more two-char tokens.
+		if l.peekChar() == '=' {
+			// memorize current char before readChar calls overwrites current char.
+			ch := l.ch
+			l.readChar()
+			literal := string(ch) + string(l.ch)
+			tok = token.Token{Type: token.EQ, Literal: literal}
+		}
 	case '+':
 		tok = newToken(token.PLUS, l.ch)
 	case '-':
 		tok = newToken(token.MINUS, l.ch)
 	case '!':
 		tok = newToken(token.BANG, l.ch)
+		// Token will be updated when detecting "!=" tokens.
+		if l.peekChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			literal := string(ch) + string(l.ch)
+			tok = token.Token{Type: token.NOTEQ, Literal: literal}
+		}
 	case '*':
 		tok = newToken(token.ASTERISK, l.ch)
 	case '/':
@@ -149,4 +165,13 @@ func (l *Lexer) readNumber() string {
 // TODO: Support float or other digit format.
 func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
+}
+
+// peekChar only looks ahead in the input and grasps what to be reuturned after readChar call in advance.
+// It doesn't move around in it.
+func (l *Lexer) peekChar() byte {
+	if l.readPosition >= len(l.input) {
+		return 0
+	}
+	return l.input[l.readPosition]
 }
