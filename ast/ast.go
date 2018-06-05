@@ -65,3 +65,14 @@ type Identifier struct {
 
 func (i *Identifier) expressionNode()      {}
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
+
+// ReturnStatement consists of solely of the keyword "return" and an "expression".
+type ReturnStatement struct {
+	Token token.Token
+
+	// ReturnValue is the expression to be returned.
+	ReturnValue Expression
+}
+
+func (rs *ReturnStatement) statementNode()       {}
+func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }
