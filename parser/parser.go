@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/toversus/monkey/ast"
 	"github.com/toversus/monkey/lexer"
 	"github.com/toversus/monkey/token"
@@ -10,6 +12,8 @@ import (
 type Parser struct {
 	l *lexer.Lexer
 
+	errors []string
+
 	// curToken is "pointers" (position and readPosition) to the current token.
 	curToken token.Token
 	// peekToken is also "pointers" to the next token.
@@ -18,7 +22,10 @@ type Parser struct {
 
 // New initiates parser.
 func New(l *lexer.Lexer) *Parser {
-	p := &Parser{l: l}
+	p := &Parser{
+		l:      l,
+		errors: []string{},
+	}
 
 	// Read two tokens, so curToken and peekToken are both set.
 	p.nextToken()
@@ -94,13 +101,24 @@ func (p *Parser) peekTokenIs(t token.TokenType) bool {
 
 // expectPeek is assertion function to enforce the correctness of the order of tokens
 // by checking the type of the next token.
-// It returns nil and gets ignored if encountering a token that's not of the expected type,
-// but this behavior makes it tough for debugging.
-// TODO: Introduce error handling to the parser.
+// It returns error expressions and shows the expected type of token if encountering a mismatch of type of token.
 func (p *Parser) expectPeek(t token.TokenType) bool {
 	if p.peekTokenIs(t) {
 		p.nextToken()
 		return true
 	}
+	p.peekError(t)
 	return false
+}
+
+// Errors returns error messages.
+func (p *Parser) Errors() []string {
+	return p.errors
+}
+
+// peekError is helper function to detect mismatch of the type of peekToken.
+func (p *Parser) peekError(t token.TokenType) {
+	msg := fmt.Sprintf("expected next token to be %s, got %s instead",
+		t, p.peekToken.Type)
+	p.errors = append(p.errors, msg)
 }
