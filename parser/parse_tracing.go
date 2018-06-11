@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-var traceLevel int = 0
+var traceLevel = 0
 
 const traceIdentPlaceholder string = "\t"
 
@@ -17,8 +17,8 @@ func tracePrint(fs string) {
 	fmt.Printf("%s%s\n", identLevel(), fs)
 }
 
-func incIdent() { traceLevel = traceLevel + 1 }
-func decIdent() { traceLevel = traceLevel - 1 }
+func incIdent() { traceLevel++ }
+func decIdent() { traceLevel-- }
 
 func trace(msg string) string {
 	incIdent()
