@@ -193,6 +193,8 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		{"-15", "-", 15},
 		{"!foobar;", "!", "foobar"},
 		{"-foobar;", "-", "foobar"},
+		{"!true;", "!", true},
+		{"!false;", "!", false},
 	}
 
 	for _, test := range prefixTests {
@@ -270,6 +272,9 @@ func TestParsingInfixExpressions(t *testing.T) {
 		{"foobar < barfoo;", "foobar", "<", "barfoo"},
 		{"foobar == barfoo;", "foobar", "==", "barfoo"},
 		{"foobar != barfoo;", "foobar", "!=", "barfoo"},
+		{"true == true", true, "==", true},
+		{"true != false", true, "!=", false},
+		{"false == false", false, "==", false},
 	}
 
 	for _, test := range infixTests {
@@ -291,6 +296,15 @@ func TestParsingInfixExpressions(t *testing.T) {
 
 		if !testInfixExpression(t, stmt.Expression, test.leftValue,
 			test.operator, test.rightValue) {
+			return
+		}
+
+		exp, ok := stmt.Expression.(*ast.InfixExpression)
+		if !testLiteralExpression(t, exp.Left, test.leftValue) {
+			return
+		}
+
+		if !testLiteralExpression(t, exp.Right, test.rightValue) {
 			return
 		}
 	}
@@ -385,6 +399,8 @@ func testLiteralExpression(t *testing.T, exp ast.Expression, want interface{}) b
 		return testIntegerLiteral(t, exp, v)
 	case string:
 		return testIdentifier(t, exp, v)
+	case bool:
+		return testBooleanLiteral(t, exp, v)
 	default:
 		t.Errorf("type of exp not handled. got=%T", exp)
 		return false
@@ -449,4 +465,25 @@ func TestBooleanExpression(t *testing.T) {
 			t.Errorf("ident.Value not %t. got=%t", test.want, boolean.Value)
 		}
 	}
+}
+
+func testBooleanLiteral(t *testing.T, exp ast.Expression, value bool) bool {
+	bo, ok := exp.(*ast.Boolean)
+	if !ok {
+		t.Errorf("exp not *ast.Boolean. got=%T", exp)
+		return false
+	}
+
+	if bo.Value != value {
+		t.Errorf("bo.Value not %t. got=%t", value, bo.Value)
+		return false
+	}
+
+	if bo.TokenLiteral() != fmt.Sprintf("%t", value) {
+		t.Errorf("bo.TokenLiteral not %t. got=%s",
+			value, bo.TokenLiteral())
+		return false
+	}
+
+	return true
 }
