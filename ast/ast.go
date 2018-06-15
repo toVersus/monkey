@@ -286,3 +286,34 @@ func (fl *FunctionLiteral) String() string {
 
 	return out.String()
 }
+
+// CallExpression represents call expression.
+//   <expression>(<comma separated expressions>)
+// It may follow the identifier (expression) and has arguments (list of expressions):
+//   add(2 + 2, 3 * 3 * 3)
+// It also supports anonymous and first class function:
+//   fn(x, y) {x + y;}(2, 3)
+//   callsFunction(2, 3, fn(x, y) {x + y;});
+type CallExpression struct {
+	Token     token.Token
+	Function  Expression
+	Arguments []Expression
+}
+
+func (ce *CallExpression) expressionNode()      {}
+func (ce *CallExpression) TokenLiteral() string { return ce.Token.Literal }
+func (ce *CallExpression) String() string {
+	var out bytes.Buffer
+
+	args := []string{}
+	for _, a := range ce.Arguments {
+		args = append(args, a.String())
+	}
+
+	out.WriteString(ce.Function.String())
+	out.WriteString("(")
+	out.WriteString(strings.Join(args, ", "))
+	out.WriteString(")")
+
+	return out.String()
+}
