@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/toversus/monkey/ast"
+	"github.com/toversus/monkey/flags"
 	"github.com/toversus/monkey/lexer"
 	"github.com/toversus/monkey/token"
 )
@@ -225,7 +226,9 @@ func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
 }
 
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
-	defer untrace(trace("parseExpressionStatement"))
+	if *flags.Debug {
+		defer untrace(trace("parseExpressionStatement"))
+	}
 	stmt := &ast.ExpressionStatement{Token: p.curToken}
 
 	stmt.Expression = p.parseExpression(LOWEST)
@@ -249,7 +252,9 @@ func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 // If it finds such a function, it calls it and passess in the expression
 // until it encounters higher precedence.
 func (p *Parser) parseExpression(precedence int) ast.Expression {
-	defer untrace(trace("parseExpression"))
+	if *flags.Debug {
+		defer untrace(trace("parseExpression"))
+	}
 	prefix := p.prefixParseFns[p.curToken.Type]
 	if prefix == nil {
 		p.noPrefixParseFnError(p.curToken.Type)
@@ -274,7 +279,9 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 // parseIntegerLiteral constructs *ast.IntegerLiteral node
 // and saves int64 converted from string to the Value field.
 func (p *Parser) parseIntegerLiteral() ast.Expression {
-	defer untrace(trace("parseIntegerLiteral"))
+	if *flags.Debug {
+		defer untrace(trace("parseIntegerLiteral"))
+	}
 	lit := &ast.IntegerLiteral{Token: p.curToken}
 
 	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
@@ -290,7 +297,9 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 
 // parsePrefixExpression constructs *ast.PrefixExpression and advances tokens.
 func (p *Parser) parsePrefixExpression() ast.Expression {
-	defer untrace(trace("parsePrefixExpression"))
+	if *flags.Debug {
+		defer untrace(trace("parsePrefixExpression"))
+	}
 	expression := &ast.PrefixExpression{
 		Token:    p.curToken,
 		Operator: p.curToken.Literal,
@@ -323,7 +332,9 @@ func (p *Parser) curPrecedence() int {
 
 // parseInfixExpression constructs infix expression after resolving precedence.
 func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
-	defer untrace(trace("parseInfixExpression"))
+	if *flags.Debug {
+		defer untrace(trace("parseInfixExpression"))
+	}
 	expression := &ast.InfixExpression{
 		Token:    p.curToken,
 		Operator: p.curToken.Literal,
