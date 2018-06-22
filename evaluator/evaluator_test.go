@@ -185,3 +185,57 @@ if (10 > 1) {
 		testIntegerObject(t, evaluated, test.want)
 	}
 }
+
+// TestErrorHandling asserts that errors are created for unsupported operations
+// and that errors prevent any further evaluation.
+func TestErrorHandling(t *testing.T) {
+	tests := []struct {
+		input       string
+		wantMessage string
+	}{
+		{
+			"5 + true;",
+			"type mismatch: INTEGER + BOOLEAN",
+		},
+		{
+			"-true",
+			"unknown operator: -BOOLEAN",
+		},
+		{
+			"true + false;",
+			"unknown operator: BOOLEAN + BOOLEAN",
+		},
+		{
+			"5; true + false; 5;",
+			"unknown operator: BOOLEAN + BOOLEAN",
+		},
+		{
+			`
+if (10 > 1) {
+	if (10 > 1) {
+		return true + false;
+	}
+	
+	return 1;
+}`,
+			"unknown operator: BOOLEAN + BOOLEAN",
+		},
+	}
+
+	for _, test := range tests {
+		evaluated := testEval(test.input)
+
+		errObj, ok := evaluated.(*object.Error)
+		if !ok {
+			t.Errorf("no error object returned. got=%T(%v)",
+				evaluated, evaluated)
+			continue
+		}
+
+		if errObj.Message != test.wantMessage {
+			t.Errorf("wrong error message. wanted=%q, got=%q",
+				test.wantMessage, errObj.Message)
+		}
+
+	}
+}
