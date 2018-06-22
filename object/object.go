@@ -13,6 +13,26 @@ const (
 	ERROR_OBJ        = "ERROR"
 )
 
+// Environment is used to keep track of value by associating them with a name.
+type Environment struct {
+	store map[string]Object
+}
+
+func NewEnvironment() *Environment {
+	s := make(map[string]Object)
+	return &Environment{store: s}
+}
+
+func (e *Environment) Get(name string) (Object, bool) {
+	obj, ok := e.store[name]
+	return obj, ok
+}
+
+func (e *Environment) Set(name string, val Object) Object {
+	e.store[name] = val
+	return val
+}
+
 // Object is implemented as interface because every value needs a diffrent internal representation
 // and it's easier to define two different struct types than fitting basic data types into the same struct fields.
 type Object interface {
