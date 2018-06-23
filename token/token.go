@@ -12,6 +12,9 @@ const (
 	IDENT = "IDENT"
 	// INT represents integer such as 123456.
 	INT = "INT"
+	// STRING represents string literal which are sequence of characters.
+	// TODO: support for character escaping.
+	STRING = "STRING"
 
 	// ASSIGN is used when binding some values to a name.
 	ASSIGN = "="
