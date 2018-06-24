@@ -13,6 +13,25 @@ var (
 	FALSE = &object.Boolean{Value: false}
 )
 
+var builtins = map[string]*object.Builtin{
+	"len": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1",
+					len(args))
+			}
+
+			switch arg := args[0].(type) {
+			case *object.String:
+				return &object.Integer{Value: int64(len(arg.Value))}
+			default:
+				return newError("argument to 'len' not supported, got %s",
+					args[0].Type())
+			}
+		},
+	},
+}
+
 // Eval traverses the AST and evaluates basic types.
 func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch node := node.(type) {
@@ -287,17 +306,20 @@ func isError(obj object.Object) bool {
 }
 
 // evalIdentifier checks if a value has been associated with the given name in the current environment
-// and returns the value.
+// and returns the value. It lookups built-in functions when the given identifier is not bound to a value in the current environment.
 func evalIdentifier(
 	node *ast.Identifier,
 	env *object.Environment,
 ) object.Object {
-	val, ok := env.Get(node.Value)
-	if !ok {
-		return newError("identifier not found: " + node.Value)
+	if val, ok := env.Get(node.Value); ok {
+		return val
 	}
 
-	return val
+	if builtin, ok := builtins[node.Value]; ok {
+		return builtin
+	}
+
+	return newError("identifier not found: " + node.Value)
 }
 
 // evalExpression iterates over a list of ast.Expression and evaluates them in the context of the current environment.
@@ -316,17 +338,22 @@ func evalExpression(exps []ast.Expression, env *object.Environment) []object.Obj
 	return result
 }
 
-// applyFunction converts the fn parameter to a *object.Function reference
+// applyFunction converts the fn parameter to a *object.Function or *object.Builtin reference
 // in order to get access to the function's environment and body.
+// For *object.Builtin, built-in functions never return value when calling them.
 func applyFunction(fn object.Object, args []object.Object) object.Object {
-	function, ok := fn.(*object.Function)
-	if !ok {
+	switch fn := fn.(type) {
+	case *object.Function:
+		extendedEnv := extendFunctionEnv(fn, args)
+		evaluated := Eval(fn.Body, extendedEnv)
+		return unwrapReturnValue(evaluated)
+
+	case *object.Builtin:
+		return fn.Fn(args...)
+
+	default:
 		return newError("not a function: %s", fn.Type())
 	}
-
-	extendedEnv := extendFunctionEnv(function, args)
-	evaluated := Eval(function.Body, extendedEnv)
-	return unwrapReturnValue(evaluated)
 }
 
 // extendFunctionEnv is used for binding the arguments of the function call to the function's parameter names
