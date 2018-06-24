@@ -44,10 +44,12 @@ const (
 	// SEMICOLON is delimiter to represent the end of statement.
 	SEMICOLON = ";"
 
-	LPAREN = "("
-	RPAREN = ")"
-	LBRACE = "{"
-	RBRACE = "}"
+	LPAREN   = "("
+	RPAREN   = ")"
+	LBRACE   = "{"
+	RBRACE   = "}"
+	LBRACKET = "["
+	RBRACKET = "]"
 
 	// FUNCTION declares the definition of function.
 	// In Monkey, functions are just values like integers or strings (first class functions),
