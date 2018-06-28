@@ -43,6 +43,8 @@ const (
 	COMMA = ","
 	// SEMICOLON is delimiter to represent the end of statement.
 	SEMICOLON = ";"
+	// COLON is delimiter to represent the hash map.
+	COLON = ":"
 
 	LPAREN   = "("
 	RPAREN   = ")"
