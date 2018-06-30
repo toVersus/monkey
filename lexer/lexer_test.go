@@ -33,6 +33,10 @@ if (5 < 10) {
 "foo bar"
 [1, 2];
 {"foo": "bar"}
+
+let pi = 3.14;
+[1, 3.14];
+3.14 == 3.14;
 `
 
 	tests := []struct {
@@ -125,6 +129,21 @@ if (5 < 10) {
 		{token.COLON, ":"},
 		{token.STRING, "bar"},
 		{token.RBRACE, "}"},
+		{token.LET, "let"},
+		{token.IDENT, "pi"},
+		{token.ASSIGN, "="},
+		{token.FLOAT, "3.14"},
+		{token.SEMICOLON, ";"},
+		{token.LBRACKET, "["},
+		{token.INT, "1"},
+		{token.COMMA, ","},
+		{token.FLOAT, "3.14"},
+		{token.RBRACKET, "]"},
+		{token.SEMICOLON, ";"},
+		{token.FLOAT, "3.14"},
+		{token.EQ, "=="},
+		{token.FLOAT, "3.14"},
+		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
 

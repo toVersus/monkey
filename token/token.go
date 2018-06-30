@@ -15,6 +15,7 @@ const (
 	// STRING represents string literal which are sequence of characters.
 	// TODO: support for character escaping.
 	STRING = "STRING"
+	FLOAT  = "FLOAT"
 
 	// ASSIGN is used when binding some values to a name.
 	ASSIGN = "="

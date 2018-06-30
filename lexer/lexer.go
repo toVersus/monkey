@@ -114,9 +114,7 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Type = token.LookupIdent(tok.Literal)
 			return tok
 		} else if isDigit(l.ch) {
-			tok.Literal = l.readNumber()
-			tok.Type = token.INT
-			return tok
+			return l.readNumericToken()
 		}
 		// If reaching end of this block, the current char cannot be handled.
 		tok = newToken(token.ILLEGAL, l.ch)
@@ -169,11 +167,33 @@ func (l *Lexer) readNumber() string {
 	return l.input[position:l.position]
 }
 
+func (l *Lexer) readNumericToken() token.Token {
+	intPart := l.readNumber()
+
+	if l.ch != '.' {
+		return token.Token{
+			Type:    token.INT,
+			Literal: intPart,
+		}
+	}
+
+	l.readChar()
+	fracPart := l.readNumber()
+	return token.Token{
+		Type:    token.FLOAT,
+		Literal: intPart + "." + fracPart,
+	}
+}
+
 // isDigit is helper function to check whether the given argument is integer or not.
 // This means that it doesn't support float, numbers in hex and octal notation in this stage.
 // TODO: Support float or other digit format.
 func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
+}
+
+func isFloat(ch byte) bool {
+	return ch == '.'
 }
 
 // peekChar only looks ahead in the input and grasps what to be reuturned after readChar call in advance.
