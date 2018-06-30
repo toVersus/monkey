@@ -1,6 +1,10 @@
 package evaluator
 
-import "github.com/toversus/monkey/object"
+import (
+	"fmt"
+
+	"github.com/toversus/monkey/object"
+)
 
 var builtins = map[string]*object.Builtin{
 	"len":   &object.Builtin{Fn: lenFunc},
@@ -8,6 +12,7 @@ var builtins = map[string]*object.Builtin{
 	"last":  &object.Builtin{Fn: lastFunc},
 	"rest":  &object.Builtin{Fn: restFunc},
 	"push":  &object.Builtin{Fn: pushFunc},
+	"puts":  &object.Builtin{Fn: putsFunc},
 }
 
 func lenFunc(args ...object.Object) object.Object {
@@ -106,4 +111,13 @@ func pushFunc(args ...object.Object) object.Object {
 	newElements[length] = args[1]
 
 	return &object.Array{Elements: newElements}
+}
+
+// putsFunc prints the given arguments on new lines to STDOUT.
+func putsFunc(args ...object.Object) object.Object {
+	for _, arg := range args {
+		fmt.Println(arg.Inspect())
+	}
+
+	return NULL
 }
