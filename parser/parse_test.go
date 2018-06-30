@@ -20,6 +20,7 @@ func TestLetStatements(t *testing.T) {
 	}{
 		{"let x = 5;", "x", 5},
 		{"let y = true;", "y", true},
+		{"let pi = 3.14;", "pi", 3.14},
 		{"let foobar = y;", "foobar", "y"},
 	}
 
@@ -93,6 +94,7 @@ func TestReturnStatements(t *testing.T) {
 		wantValue interface{}
 	}{
 		{"return 5;", 5},
+		{"return 3.14;", 3.14},
 		{"return true;", true},
 		{"return foobar;", "foobar"},
 	}
@@ -189,6 +191,34 @@ func TestIntegerLiteralExpression(t *testing.T) {
 	}
 }
 
+func TestFloatLiteralExpression(t *testing.T) {
+	input := `3.14;`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. got=%d",
+			len(program.Statements))
+	}
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("exp not *ast.FloatLiteral. got=%T",
+			program.Statements[0])
+	}
+	literal, ok := stmt.Expression.(*ast.FloatLiteral)
+	if !ok {
+		t.Fatalf("exp not *ast.FloatLiteral. got=%T",
+			stmt.Expression)
+	}
+	if literal.Value != 3.14 {
+		t.Errorf("literal.Value not %f. got=%f", 3.14,
+			literal.Value)
+	}
+}
+
 func TestParsingPrefixExpressions(t *testing.T) {
 	prefixTests := []struct {
 		input    string
@@ -252,6 +282,21 @@ func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
 			integ.TokenLiteral())
 		return false
 	}
+	return true
+}
+
+func testFloatLiteral(t *testing.T, fl ast.Expression, value float64) bool {
+	float, ok := fl.(*ast.FloatLiteral)
+	if !ok {
+		t.Errorf("fl not *ast.FloatLiteral. got=%T", fl)
+		return false
+	}
+
+	if float.Value != value {
+		t.Errorf("float.Value not %f. got=%f", value, float.Value)
+		return false
+	}
+
 	return true
 }
 
@@ -443,6 +488,8 @@ func testLiteralExpression(t *testing.T, exp ast.Expression, want interface{}) b
 		return testIntegerLiteral(t, exp, int64(v))
 	case int64:
 		return testIntegerLiteral(t, exp, v)
+	case float64:
+		return testFloatLiteral(t, exp, v)
 	case string:
 		return testIdentifier(t, exp, v)
 	case bool:
