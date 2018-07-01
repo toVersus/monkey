@@ -60,6 +60,41 @@ func testIntegerObject(t *testing.T, obj object.Object, want int64) bool {
 	return true
 }
 
+func TestEvalFloatExpression(t *testing.T) {
+	tests := []struct {
+		input string
+		want  float64
+	}{
+		{"3.14", 3.14},
+		{"-3.14", -3.14},
+		{"3.14 + 3.14", 6.28},
+		{"0.1 - 0.2", -0.1},
+		{"0.1 + 0.1 - 0.2", 0},
+		{"1.0 / 0.1", 10.0},
+		{"2.0 * 2.0 + 2.0", 6.0},
+		{"(5 + 10.0 * 2.5 + 15.0 / 3) * 2.1 + -10.1", 63.4},
+	}
+
+	for _, test := range tests {
+		evaluated := testEval(test.input)
+		testFloatObject(t, evaluated, test.want)
+	}
+}
+
+func testFloatObject(t *testing.T, obj object.Object, want float64) bool {
+	result, ok := obj.(*object.Float)
+	if !ok {
+		t.Errorf("object is not Float. got=%T (%#+v)", obj, obj)
+		return false
+	}
+	if result.Value != want {
+		t.Errorf("object has wrong value. got=%+v, want=%+v", result.Value, want)
+		return false
+	}
+
+	return true
+}
+
 func TestEvalBooleanExpression(t *testing.T) {
 	tests := []struct {
 		input string
@@ -75,6 +110,8 @@ func TestEvalBooleanExpression(t *testing.T) {
 		{"1 != 1", false},
 		{"1 == 2", false},
 		{"1 != 2", true},
+		{"3.14 == 3.14", true},
+		{"3.14 != 3.14", false},
 		{"true == true", true},
 		{"false == false", true},
 		{"true == false", false},
@@ -216,6 +253,10 @@ func TestErrorHandling(t *testing.T) {
 		{
 			"5 + true;",
 			"type mismatch: INTEGER + BOOLEAN",
+		},
+		{
+			"3.14 + true;",
+			"type mismatch: FLOAT + BOOLEAN",
 		},
 		{
 			"-true",
