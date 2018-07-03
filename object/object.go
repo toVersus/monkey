@@ -165,6 +165,13 @@ func (i *Integer) HashKey() HashKey {
 	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
 }
 
+func (f *Float) HashKey() HashKey {
+	val := strconv.FormatFloat(f.Value, 'f', -1, 64)
+	h := fnv.New64a()
+	h.Write([]byte(val))
+	return HashKey{Type: f.Type(), Value: h.Sum64()}
+}
+
 func (s *String) HashKey() HashKey {
 	h := fnv.New64a()
 	h.Write([]byte(s.Value))

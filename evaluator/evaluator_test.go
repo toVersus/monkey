@@ -553,7 +553,8 @@ func TestHashLiterals(t *testing.T) {
 		"thr" + "ee": 6 / 2,
 		4: 4,
 		true: 5,
-		false: 6
+		false: 6,
+		3.14: 7,
 	}`
 
 	evaluated := testEval(input)
@@ -569,6 +570,7 @@ func TestHashLiterals(t *testing.T) {
 		(&object.Integer{Value: 4}).HashKey():      4,
 		TRUE.HashKey():                             5,
 		FALSE.HashKey():                            6,
+		(&object.Float{Value: 3.14}).HashKey():     7,
 	}
 
 	if len(result.Pairs) != len(want) {
@@ -599,6 +601,14 @@ func TestHashIndexExpression(t *testing.T) {
 			nil,
 		},
 		{
+			`{"pi": 3.14}["pi"]`,
+			3.14,
+		},
+		{
+			`{"pi": 3.14}["ip"]`,
+			nil,
+		},
+		{
 			`let key = "foo"; {"foo": 5}[key]`,
 			5,
 		},
@@ -622,10 +632,12 @@ func TestHashIndexExpression(t *testing.T) {
 
 	for _, test := range tests {
 		evaluated := testEval(test.input)
-		integer, ok := test.want.(int)
-		if ok {
-			testIntegerObject(t, evaluated, int64(integer))
-		} else {
+		switch val := test.want.(type) {
+		case int:
+			testIntegerObject(t, evaluated, int64(val))
+		case float64:
+			testFloatObject(t, evaluated, float64(val))
+		default:
 			testNullObject(t, evaluated)
 		}
 	}
