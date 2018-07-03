@@ -290,6 +290,10 @@ if (10 > 1) {
 			"unknown operator: STRING - STRING",
 		},
 		{
+			"[1, 2, 3][1.0]",
+			`index operator not supported for ARRAY: FLOAT`,
+		},
+		{
 			`{"name": "Monkey"}[fn(x) { x }];`,
 			"unusable as hash key: FUNCTION",
 		},
@@ -499,6 +503,10 @@ func TestArrayIndexExpressions(t *testing.T) {
 			3,
 		},
 		{
+			"[1, 2, 3.14][2]",
+			3.14,
+		},
+		{
 			"let i = 0; [1][i];",
 			1,
 		},
@@ -526,10 +534,12 @@ func TestArrayIndexExpressions(t *testing.T) {
 
 	for _, test := range tests {
 		evaluated := testEval(test.input)
-		integer, ok := test.want.(int)
-		if ok {
-			testIntegerObject(t, evaluated, int64(integer))
-		} else {
+		switch val := test.want.(type) {
+		case int:
+			testIntegerObject(t, evaluated, int64(val))
+		case float64:
+			testFloatObject(t, evaluated, float64(val))
+		default:
 			testNullObject(t, evaluated)
 		}
 	}
