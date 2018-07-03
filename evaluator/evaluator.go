@@ -228,9 +228,9 @@ func evalInfixExpression(
 	// pointer comparison to check for equality between booleans.
 	// This works because of using pointers to booleans, which are only two, TRUE and FALSE.
 	case operator == "==":
-		return nativeBoolToBooleanObject(left == right)
+		return nativeBoolToBooleanObject(left.Inspect() == right.Inspect())
 	case operator == "!=":
-		return nativeBoolToBooleanObject(left != right)
+		return nativeBoolToBooleanObject(left.Inspect() != right.Inspect())
 
 	case left.Type() != right.Type():
 		return newError("type mismatch: %s %s %s",
@@ -443,7 +443,6 @@ func unwrapReturnValue(obj object.Object) object.Object {
 
 // evalStringInfixExpression checks for the correct operator and unwrap the string object and
 // construct a new string concatenating both operands.
-// TODO: support "==" and "!=" operators for string literals.
 func evalStringInfixExpression(operator string, left, right object.Object) object.Object {
 	if operator != "+" {
 		return newError("unknown operator: %s %s %s",
