@@ -1,1 +1,1 @@
-The interpreter for Monkey Programming Language designed in [_Writing An Interpreter In Go_](https://interpreterbook.com/).
+The interpreter and compiler for Monkey Programming Language designed in [_Writing An Interpreter In Go_](https://interpreterbook.com/) and its sequel [_Writing A Compiler In Go_](https://compilerbook.com/).
