@@ -1,6 +1,7 @@
 package code
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 )
@@ -16,6 +17,43 @@ type Definition struct {
 // Instructions represents first bytecode instruction, which consists of
 // an opcode and an optional number of operands.
 type Instructions []byte
+
+// String is used to show nicely-formatted multi-line output that tells us
+// the opcodes in human-readable form.
+func (ins Instructions) String() string {
+	var out bytes.Buffer
+
+	i := 0
+	for i < len(ins) {
+		def, err := Lookup(ins[i])
+		if err != nil {
+			fmt.Fprintf(&out, "ERROR: %s\n", err)
+			continue
+		}
+		operands, read := ReadOperands(def, ins[i+1:])
+		fmt.Fprintf(&out, "%04d %s\n", i, ins.fmtInstruction(def, operands))
+		i += 1 + read
+	}
+	return out.String()
+}
+
+func (ins Instructions) fmtInstruction(def *Definition, operands []int) string {
+	operandCount := len(def.OperandWidths)
+
+	if len(operands) != operandCount {
+		return fmt.Sprintf("ERROR: operand len %d does not match defined %d\n",
+			len(operands), operandCount)
+	}
+
+	switch operandCount {
+	case 0:
+		return def.Name
+	case 1:
+		return fmt.Sprintf("%s %d", def.Name, operands[0])
+	}
+
+	return fmt.Sprintf("ERROR: unhandled operandCount for %s\n", def.Name)
+}
 
 // Opcode has an arbitary but unique value and is the first byte in the instruction.
 type Opcode byte
@@ -68,4 +106,25 @@ func Make(op Opcode, operands ...int) []byte {
 		offset += width
 	}
 	return instruction
+}
+
+// ReadOperands decode operands of a bytecode instruction.
+func ReadOperands(def *Definition, ins Instructions) ([]int, int) {
+	operands := make([]int, len(def.OperandWidths))
+	offset := 0
+
+	for i, width := range def.OperandWidths {
+		switch width {
+		case 2:
+			operands[i] = int(ReadUint16(ins[offset:]))
+		}
+		offset += width
+	}
+	return operands, offset
+}
+
+// ReadUint16 skips the definition lookup required by ReadOperands
+// and is used directly by the VM.
+func ReadUint16(ins Instructions) uint16 {
+	return binary.BigEndian.Uint16(ins)
 }
