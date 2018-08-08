@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/toversus/monkey/object"
-
-	"github.com/toversus/monkey/evaluator"
+	"github.com/toversus/monkey/compiler"
 	"github.com/toversus/monkey/lexer"
 	"github.com/toversus/monkey/parser"
+	"github.com/toversus/monkey/vm"
 )
 
 const (
@@ -32,11 +31,10 @@ const (
 )
 
 // Start reads from input source code until encountering a newline
-// and passes it to an instance of lexer and prints all the tokens
+// and passes it to an instance of lexer and compiles and executes the program
 // until the end of source code.
 func Start(in io.Reader, out io.Writer) {
 	sc := bufio.NewScanner(in)
-	env := object.NewEnvironment()
 
 	for {
 		fmt.Print(PROMPT)
@@ -54,11 +52,22 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		evaluated := evaluator.Eval(program, env)
-		if evaluated != nil {
-			io.WriteString(out, evaluated.Inspect())
-			io.WriteString(out, "\n")
+		comp := compiler.New()
+		err := comp.Compile(program)
+		if err != nil {
+			fmt.Fprintf(out, "Woops! Compilation failed:\n %s\n", err)
+			continue
 		}
+
+		machine := vm.New(comp.Bytecode())
+		err = machine.Run()
+		if err != nil {
+			fmt.Fprintf(out, "Woops! Executing bytecode failed:\n %s\n", err)
+		}
+
+		stackTop := machine.StackTop()
+		io.WriteString(out, stackTop.Inspect())
+		io.WriteString(out, "\n")
 	}
 }
 
