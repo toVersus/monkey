@@ -11,6 +11,7 @@ func TestMake(t *testing.T) {
 		// 65534 is used to confirm the most significant byte comes first.
 		// 65535 is the sequence 0xFF 0xFF and hard to recognize an order of endian.
 		{OpConstant, []int{65534}, []byte{byte(OpConstant), 255, 254}},
+		{OpAdd, []int{}, []byte{byte(OpAdd)}},
 	}
 
 	for _, test := range tests {
@@ -32,14 +33,14 @@ func TestMake(t *testing.T) {
 
 func TestInstructionsString(t *testing.T) {
 	instructions := []Instructions{
-		Make(OpConstant, 1),
+		Make(OpAdd),
 		Make(OpConstant, 2),
 		Make(OpConstant, 65535),
 	}
 
-	expected := `0000 OpConstant 1
-0003 OpConstant 2
-0006 OpConstant 65535
+	expected := `0000 OpAdd
+0001 OpConstant 2
+0004 OpConstant 65535
 `
 
 	concatted := Instructions{}

@@ -63,10 +63,12 @@ const (
 	// VM will retrieve the constant using the operand as an index
 	// and push it on to the stack.
 	OpConstant Opcode = iota
+	OpAdd
 )
 
 var definitions = map[Opcode]*Definition{
 	OpConstant: {"OpConstant", []int{2}},
+	OpAdd:      {"OpAdd", []int{}}, // no operands.
 }
 
 // Lookup gets to the definition of opcode.

@@ -1,6 +1,8 @@
 package compiler
 
 import (
+	"fmt"
+
 	"github.com/toversus/monkey/ast"
 	"github.com/toversus/monkey/code"
 	"github.com/toversus/monkey/object"
@@ -45,6 +47,13 @@ func (c *Compiler) Compile(node ast.Node) error {
 		err = c.Compile(node.Right)
 		if err != nil {
 			return err
+		}
+
+		switch node.Operator {
+		case "+":
+			c.emit(code.OpAdd)
+		default:
+			return fmt.Errorf("unknown operator %s", node)
 		}
 
 	case *ast.IntegerLiteral:
