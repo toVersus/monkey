@@ -59,19 +59,21 @@ func (ins Instructions) fmtInstruction(def *Definition, operands []int) string {
 type Opcode byte
 
 const (
-	// OpConstant has one operand, the number previously assigned to the constant.
-	// VM will retrieve the constant using the operand as an index
-	// and push it on to the stack.
-	OpConstant Opcode = iota
-	OpAdd
-	// OpPop is used to tell the VM to pop the topmost element off the stack.
-	OpPop
+	OpConstant Opcode = iota // the constant using the operand as an index and push it on to the stack.
+	OpAdd                    // '+'
+	OpPop                    // pop the topmost element off the stack.
+	OpSub                    // '-'
+	OpMul                    // '*'
+	OpDiv                    // '/'
 )
 
 var definitions = map[Opcode]*Definition{
-	OpConstant: {"OpConstant", []int{2}},
-	OpAdd:      {"OpAdd", []int{}}, // no operands.
-	OpPop:      {"OpPop", []int{}}, // no operands.
+	OpConstant: {"OpConstant", []int{2}}, // one operand, the number previously assigned to the constant.
+	OpAdd:      {"OpAdd", []int{}},
+	OpPop:      {"OpPop", []int{}},
+	OpSub:      {"OpSub", []int{}},
+	OpMul:      {"OpMul", []int{}},
+	OpDiv:      {"OpDiv", []int{}},
 }
 
 // Lookup gets to the definition of opcode.
