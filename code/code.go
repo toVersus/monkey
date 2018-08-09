@@ -64,11 +64,14 @@ const (
 	// and push it on to the stack.
 	OpConstant Opcode = iota
 	OpAdd
+	// OpPop is used to tell the VM to pop the topmost element off the stack.
+	OpPop
 )
 
 var definitions = map[Opcode]*Definition{
 	OpConstant: {"OpConstant", []int{2}},
 	OpAdd:      {"OpAdd", []int{}}, // no operands.
+	OpPop:      {"OpPop", []int{}}, // no operands.
 }
 
 // Lookup gets to the definition of opcode.

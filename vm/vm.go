@@ -29,12 +29,10 @@ func New(bytecode *compiler.Bytecode) *VM {
 	}
 }
 
-// StackTop returns object pushed onto the top of the stack.
-func (vm *VM) StackTop() object.Object {
-	if vm.sp == 0 {
-		return nil
-	}
-	return vm.stack[vm.sp-1]
+// LastPoppedStackElem pops the next free slot in vm.stack,
+// where a new element would be pushed.
+func (vm *VM) LastPoppedStackElem() object.Object {
+	return vm.stack[vm.sp]
 }
 
 func (vm *VM) Run() error {
@@ -60,6 +58,9 @@ func (vm *VM) Run() error {
 
 			result := leftValue + rightValue
 			vm.push(&object.Integer{Value: result})
+
+		case code.OpPop:
+			vm.pop()
 		}
 	}
 
