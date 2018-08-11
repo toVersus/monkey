@@ -59,35 +59,53 @@ func (ins Instructions) fmtInstruction(def *Definition, operands []int) string {
 type Opcode byte
 
 const (
-	OpConstant    Opcode = iota // the constant using the operand as an index and push it on to the stack.
-	OpAdd                       // '+'
-	OpPop                       // pop the topmost element off the stack.
-	OpSub                       // '-'
-	OpMul                       // '*'
-	OpDiv                       // '/'
-	OpTrue                      // 'true'
-	OpFalse                     // 'false'
-	OpEqual                     // '='
-	OpNotEqual                  // '!='
-	OpGreaterThan               // '>', no OpLessThan. OpLessThan is generated reordering of code.
-	OpMinus                     // prefix expression '-'
-	OpBang                      // prefix expression '!'
+	OpConstant Opcode = iota // the constant using the operand as an index and push it on to the stack.
+
+	OpAdd // '+'
+
+	OpPop // pop the topmost element off the stack.
+
+	OpSub // '-'
+	OpMul // '*'
+	OpDiv // '/'
+
+	OpTrue  // 'true'
+	OpFalse // 'false'
+
+	OpEqual       // '='
+	OpNotEqual    // '!='
+	OpGreaterThan // '>', no OpLessThan. OpLessThan is generated reordering of code.
+
+	OpMinus // prefix expression '-'
+	OpBang  // prefix expression '!'
+
+	OpJumpNotTruthy // jump if conditional is not false nor null.
+	OpJump          // jump to the index of instruction by using its operand
 )
 
 var definitions = map[Opcode]*Definition{
-	OpConstant:    {"OpConstant", []int{2}}, // one operand, the number previously assigned to the constant.
-	OpAdd:         {"OpAdd", []int{}},
-	OpPop:         {"OpPop", []int{}},
-	OpSub:         {"OpSub", []int{}},
-	OpMul:         {"OpMul", []int{}},
-	OpDiv:         {"OpDiv", []int{}},
-	OpTrue:        {"OpTrue", []int{}},
-	OpFalse:       {"OpFalse", []int{}},
+	OpConstant: {"OpConstant", []int{2}}, // one operand, the number previously assigned to the constant.
+
+	OpAdd: {"OpAdd", []int{}},
+
+	OpPop: {"OpPop", []int{}},
+
+	OpSub: {"OpSub", []int{}},
+	OpMul: {"OpMul", []int{}},
+	OpDiv: {"OpDiv", []int{}},
+
+	OpTrue:  {"OpTrue", []int{}},
+	OpFalse: {"OpFalse", []int{}},
+
 	OpEqual:       {"OpEqual", []int{}},
 	OpNotEqual:    {"OpNotEqual", []int{}},
 	OpGreaterThan: {"OpGreaterThan", []int{}},
-	OpMinus:       {"OpMinus", []int{}},
-	OpBang:        {"OpBang", []int{}},
+
+	OpMinus: {"OpMinus", []int{}},
+	OpBang:  {"OpBang", []int{}},
+
+	OpJumpNotTruthy: {"OpJumpNotTruthy", []int{2}},
+	OpJump:          {"OpJump", []int{2}},
 }
 
 // Lookup gets to the definition of opcode.
