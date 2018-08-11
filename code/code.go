@@ -70,6 +70,8 @@ const (
 	OpEqual                     // '='
 	OpNotEqual                  // '!='
 	OpGreaterThan               // '>', no OpLessThan. OpLessThan is generated reordering of code.
+	OpMinus                     // prefix expression '-'
+	OpBang                      // prefix expression '!'
 )
 
 var definitions = map[Opcode]*Definition{
@@ -84,6 +86,8 @@ var definitions = map[Opcode]*Definition{
 	OpEqual:       {"OpEqual", []int{}},
 	OpNotEqual:    {"OpNotEqual", []int{}},
 	OpGreaterThan: {"OpGreaterThan", []int{}},
+	OpMinus:       {"OpMinus", []int{}},
+	OpBang:        {"OpBang", []int{}},
 }
 
 // Lookup gets to the definition of opcode.
