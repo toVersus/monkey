@@ -81,6 +81,8 @@ const (
 
 	OpJumpNotTruthy // jump if conditional is not false nor null.
 	OpJump          // jump to the index of instruction by using its operand
+
+	OpNull // representation of 'nothing'
 )
 
 var definitions = map[Opcode]*Definition{
@@ -106,6 +108,8 @@ var definitions = map[Opcode]*Definition{
 
 	OpJumpNotTruthy: {"OpJumpNotTruthy", []int{2}},
 	OpJump:          {"OpJump", []int{2}},
+
+	OpNull: {"OpNull", []int{}},
 }
 
 // Lookup gets to the definition of opcode.
