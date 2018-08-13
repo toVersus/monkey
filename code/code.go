@@ -83,6 +83,9 @@ const (
 	OpJump          // jump to the index of instruction by using its operand
 
 	OpNull // representation of 'nothing'
+
+	OpGetGlobal // get binding for global variables
+	OpSetGlobal // set binding for global variables
 )
 
 var definitions = map[Opcode]*Definition{
@@ -110,6 +113,9 @@ var definitions = map[Opcode]*Definition{
 	OpJump:          {"OpJump", []int{2}},
 
 	OpNull: {"OpNull", []int{}},
+
+	OpGetGlobal: {"OpGetGlobal", []int{2}},
+	OpSetGlobal: {"OpSetGlobal", []int{2}},
 }
 
 // Lookup gets to the definition of opcode.
