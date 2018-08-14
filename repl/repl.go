@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/toversus/monkey/object"
+
 	"github.com/toversus/monkey/compiler"
 	"github.com/toversus/monkey/lexer"
 	"github.com/toversus/monkey/parser"
@@ -36,6 +38,10 @@ const (
 func Start(in io.Reader, out io.Writer) {
 	sc := bufio.NewScanner(in)
 
+	constants := []object.Object{}
+	globals := make([]object.Object, vm.GlobalsSize)
+	symbolTables := compiler.NewSymbolTable()
+
 	for {
 		fmt.Print(PROMPT)
 		if !sc.Scan() {
@@ -52,14 +58,19 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		comp := compiler.New()
+		comp := compiler.NewWithState(symbolTables, constants)
 		err := comp.Compile(program)
 		if err != nil {
 			fmt.Fprintf(out, "Woops! Compilation failed:\n %s\n", err)
 			continue
 		}
 
-		machine := vm.New(comp.Bytecode())
+		// update the constants reference because the compiler uses append internally
+		// and previously allocated constants slice is included in the bytecode.
+		code := comp.Bytecode()
+		constants = code.Constants
+
+		machine := vm.NewWithGlobalsStore(code, globals)
 		err = machine.Run()
 		if err != nil {
 			fmt.Fprintf(out, "Woops! Executing bytecode failed:\n %s\n", err)

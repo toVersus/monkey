@@ -8,8 +8,10 @@ import (
 	"github.com/toversus/monkey/object"
 )
 
-// StackSize is size of the stack.
-const StackSize = 2048
+const (
+	StackSize   = 2048
+	GlobalsSize = 65536
+)
 
 var (
 	True  = &object.Boolean{Value: true}
@@ -23,6 +25,8 @@ type VM struct {
 
 	stack []object.Object
 	sp    int // always points to the next value. Top of stack is stack[sp-1]
+
+	globals []object.Object // globals store.
 }
 
 func New(bytecode *compiler.Bytecode) *VM {
@@ -32,7 +36,16 @@ func New(bytecode *compiler.Bytecode) *VM {
 
 		stack: make([]object.Object, StackSize),
 		sp:    0,
+
+		globals: make([]object.Object, GlobalsSize),
 	}
+}
+
+// NewWithGlobalsStore keeps a globals store for vm execution.
+func NewWithGlobalsStore(bytecode *compiler.Bytecode, s []object.Object) *VM {
+	vm := New(bytecode)
+	vm.globals = s
+	return vm
 }
 
 // LastPoppedStackElem pops the next free slot in vm.stack,
@@ -106,6 +119,20 @@ func (vm *VM) Run() error {
 			err := vm.push(Null)
 			if err != nil {
 				return nil
+			}
+
+		case code.OpSetGlobal:
+			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+
+			vm.globals[globalIndex] = vm.pop()
+
+		case code.OpGetGlobal:
+			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+
+			if err := vm.push(vm.globals[globalIndex]); err != nil {
+				return err
 			}
 		}
 	}
