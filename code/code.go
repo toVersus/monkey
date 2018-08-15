@@ -86,6 +86,8 @@ const (
 
 	OpGetGlobal // get binding for global variables
 	OpSetGlobal // set binding for global variables
+
+	OpArray // takes N elements off the stack
 )
 
 var definitions = map[Opcode]*Definition{
@@ -116,6 +118,8 @@ var definitions = map[Opcode]*Definition{
 
 	OpGetGlobal: {"OpGetGlobal", []int{2}},
 	OpSetGlobal: {"OpSetGlobal", []int{2}},
+
+	OpArray: {"OpArray", []int{2}},
 }
 
 // Lookup gets to the definition of opcode.
