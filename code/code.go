@@ -90,6 +90,8 @@ const (
 	OpArray // takes N elements off the stack
 
 	OpHash // takes N keys and N values off the stack
+
+	OpIndex // takes the objects to be indexed and serving as the index off the stack.
 )
 
 var definitions = map[Opcode]*Definition{
@@ -124,6 +126,8 @@ var definitions = map[Opcode]*Definition{
 	OpArray: {"OpArray", []int{2}},
 
 	OpHash: {"OpHash", []int{2}},
+
+	OpIndex: {"OpIndex", []int{}},
 }
 
 // Lookup gets to the definition of opcode.
