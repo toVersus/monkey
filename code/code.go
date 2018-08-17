@@ -92,6 +92,10 @@ const (
 	OpHash // takes N keys and N values off the stack
 
 	OpIndex // takes the objects to be indexed and serving as the index off the stack.
+
+	OpCall        // function call expression
+	OpReturnValue // implicit and explicit return statement
+	OpReturn      // return statement which has no explicit return value
 )
 
 var definitions = map[Opcode]*Definition{
@@ -128,6 +132,10 @@ var definitions = map[Opcode]*Definition{
 	OpHash: {"OpHash", []int{2}},
 
 	OpIndex: {"OpIndex", []int{}},
+
+	OpCall:        {"OpCall", []int{}},
+	OpReturnValue: {"OpReturnValue", []int{}},
+	OpReturn:      {"OpReturn", []int{}},
 }
 
 // Lookup gets to the definition of opcode.
