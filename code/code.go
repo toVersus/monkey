@@ -96,6 +96,9 @@ const (
 	OpCall        // function call expression
 	OpReturnValue // implicit and explicit return statement
 	OpReturn      // return statement which has no explicit return value
+
+	OpGetLocal // get binding for local variables
+	OpSetLocal // set binding for local variables
 )
 
 var definitions = map[Opcode]*Definition{
@@ -136,6 +139,9 @@ var definitions = map[Opcode]*Definition{
 	OpCall:        {"OpCall", []int{}},
 	OpReturnValue: {"OpReturnValue", []int{}},
 	OpReturn:      {"OpReturn", []int{}},
+
+	OpGetLocal: {"OpGetLocal", []int{1}},
+	OpSetLocal: {"OpSetLocal", []int{1}},
 }
 
 // Lookup gets to the definition of opcode.
@@ -171,6 +177,9 @@ func Make(op Opcode, operands ...int) []byte {
 		switch width {
 		case 2:
 			binary.BigEndian.PutUint16(instruction[offset:], uint16(o))
+
+		case 1:
+			instruction[offset] = byte(o)
 		}
 		offset += width
 	}
@@ -186,11 +195,17 @@ func ReadOperands(def *Definition, ins Instructions) ([]int, int) {
 		switch width {
 		case 2:
 			operands[i] = int(ReadUint16(ins[offset:]))
+
+		case 1:
+			operands[i] = int(ReadUint8(ins[offset:]))
 		}
 		offset += width
 	}
 	return operands, offset
 }
+
+// ReadUint8 reads one byte and turns it into an uint8.
+func ReadUint8(ins Instructions) uint8 { return uint8(ins[0]) }
 
 // ReadUint16 skips the definition lookup required by ReadOperands
 // and is used directly by the VM.
