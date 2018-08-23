@@ -99,6 +99,8 @@ const (
 
 	OpGetLocal // get binding for local variables
 	OpSetLocal // set binding for local variables
+
+	OpGetBuiltin // get binding for builtin functions
 )
 
 var definitions = map[Opcode]*Definition{
@@ -142,6 +144,8 @@ var definitions = map[Opcode]*Definition{
 
 	OpGetLocal: {"OpGetLocal", []int{1}},
 	OpSetLocal: {"OpSetLocal", []int{1}},
+
+	OpGetBuiltin: {"OpGetBuiltin", []int{1}},
 }
 
 // Lookup gets to the definition of opcode.
