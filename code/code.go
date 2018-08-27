@@ -105,6 +105,8 @@ const (
 	OpGetBuiltin // get binding for builtin functions
 
 	OpClosure // send a message to wrap the specified compiled function in an closure
+
+	OpGetFree // get binding for free variables
 )
 
 var definitions = map[Opcode]*Definition{
@@ -152,6 +154,8 @@ var definitions = map[Opcode]*Definition{
 	OpGetBuiltin: {"OpGetBuiltin", []int{1}},
 
 	OpClosure: {"OpClosure", []int{2, 1}}, // the constant index and the count of free variables
+
+	OpGetFree: {"OpGetFree", []int{1}},
 }
 
 // Lookup gets to the definition of opcode.
