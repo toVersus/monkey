@@ -183,11 +183,12 @@ func (c *Compiler) Compile(node ast.Node) error {
 		}
 
 	case *ast.LetStatement:
+		symbol := c.symbolTable.Define(node.Name.Value)
+
 		if err := c.Compile(node.Value); err != nil {
 			return err
 		}
 
-		symbol := c.symbolTable.Define(node.Name.Value)
 		if symbol.Scope == GlobalScope {
 			c.emit(code.OpSetGlobal, symbol.Index)
 		} else {
