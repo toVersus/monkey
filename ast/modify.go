@@ -37,6 +37,9 @@ func Modify(node Node, modifier ModifyFunc) Node {
 
 	case *ReturnStatement:
 		node.ReturnValue, _ = Modify(node.ReturnValue, modifier).(Expression)
+
+	case *LetStatement:
+		node.Value, _ = Modify(node.Value, modifier).(Expression)
 	}
 
 	return modifier(node)
