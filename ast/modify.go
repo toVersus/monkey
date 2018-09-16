@@ -34,6 +34,9 @@ func Modify(node Node, modifier ModifyFunc) Node {
 		for i := range node.Statements {
 			node.Statements[i], _ = Modify(node.Statements[i], modifier).(Statement)
 		}
+
+	case *ReturnStatement:
+		node.ReturnValue, _ = Modify(node.ReturnValue, modifier).(Expression)
 	}
 
 	return modifier(node)
