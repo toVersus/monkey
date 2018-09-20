@@ -65,6 +65,8 @@ const (
 	IF     = "IF"
 	ELSE   = "ELSE"
 	RETURN = "RETURN"
+
+	MACRO = "MACRO"
 )
 
 // TokenType is used to distinguish between different type of tokens.
@@ -90,6 +92,7 @@ var keywords = map[string]TokenType{
 	"if":     IF,
 	"else":   ELSE,
 	"return": RETURN,
+	"macro":  MACRO,
 }
 
 // LookupIdent checks whether the given identifier is a reserved keyword or user-defined identifier.
