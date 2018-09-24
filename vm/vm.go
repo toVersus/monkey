@@ -307,6 +307,9 @@ func (vm *VM) executeBinaryOperation(op code.Opcode) error {
 	case leftType == object.INTEGER_OBJ && rightType == object.INTEGER_OBJ:
 		return vm.executeBinaryIntegerOperation(op, left, right)
 
+	case leftType == object.FLOAT_OBJ && rightType == object.FLOAT_OBJ:
+		return vm.executeBinaryFloatOperation(op, left, right)
+
 	case leftType == object.STRING_OBJ && rightType == object.STRING_OBJ:
 		return vm.executeBinaryStringOperation(op, left, right)
 	}
@@ -334,6 +337,27 @@ func (vm *VM) executeBinaryIntegerOperation(op code.Opcode, left, right object.O
 		return fmt.Errorf("unknown integer operator: %d", op)
 	}
 	return vm.push(&object.Integer{Value: result})
+}
+
+func (vm *VM) executeBinaryFloatOperation(op code.Opcode, left, right object.Object) error {
+	leftValue := left.(*object.Float).Value
+	rightValue := right.(*object.Float).Value
+
+	var result float64
+
+	switch op {
+	case code.OpAdd:
+		result = leftValue + rightValue
+	case code.OpSub:
+		result = leftValue - rightValue
+	case code.OpMul:
+		result = leftValue * rightValue
+	case code.OpDiv:
+		result = leftValue / rightValue
+	default:
+		return fmt.Errorf("unknown float operator: %d", op)
+	}
+	return vm.push(&object.Float{Value: result})
 }
 
 func (vm *VM) executeBinaryStringOperation(op code.Opcode, left, right object.Object) error {
@@ -391,12 +415,15 @@ func (vm *VM) executeIntegerComparison(op code.Opcode, left, right object.Object
 func (vm *VM) executeMinusOperator() error {
 	operand := vm.pop()
 
-	if operand.Type() != object.INTEGER_OBJ {
-		return fmt.Errorf("unsupported type for negation: %s", operand.Type())
+	if operand.Type() == object.INTEGER_OBJ {
+		value := operand.(*object.Integer).Value
+		return vm.push(&object.Integer{Value: -value})
+	} else if operand.Type() == object.FLOAT_OBJ {
+		value := operand.(*object.Float).Value
+		return vm.push(&object.Float{Value: -value})
 	}
 
-	value := operand.(*object.Integer).Value
-	return vm.push(&object.Integer{Value: -value})
+	return fmt.Errorf("unsupported type for negation: %s", operand.Type())
 }
 
 // executeBangOperator pops the operand off the stack and negates its value
