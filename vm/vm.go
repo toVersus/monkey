@@ -380,6 +380,8 @@ func (vm *VM) executeComparison(op code.Opcode) error {
 
 	if left.Type() == object.INTEGER_OBJ || right.Type() == object.INTEGER_OBJ {
 		return vm.executeIntegerComparison(op, left, right)
+	} else if left.Type() == object.FLOAT_OBJ || right.Type() == object.FLOAT_OBJ {
+		return vm.executeFloatComparison(op, left, right)
 	}
 
 	switch op {
@@ -398,6 +400,24 @@ func (vm *VM) executeComparison(op code.Opcode) error {
 func (vm *VM) executeIntegerComparison(op code.Opcode, left, right object.Object) error {
 	leftValue := left.(*object.Integer).Value
 	rightValue := right.(*object.Integer).Value
+
+	switch op {
+	case code.OpEqual:
+		return vm.push(nativeBoolToBooleanObject(rightValue == leftValue))
+	case code.OpNotEqual:
+		return vm.push(nativeBoolToBooleanObject(rightValue != leftValue))
+	case code.OpGreaterThan:
+		return vm.push(nativeBoolToBooleanObject(leftValue > rightValue))
+	default:
+		return fmt.Errorf("unknown operator: %d", op)
+	}
+}
+
+// executeFloatComparison unwraps the float values and compares the operands
+// then returns the resulting bool into True or False.
+func (vm *VM) executeFloatComparison(op code.Opcode, left, right object.Object) error {
+	leftValue := left.(*object.Float).Value
+	rightValue := right.(*object.Float).Value
 
 	switch op {
 	case code.OpEqual:
