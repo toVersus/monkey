@@ -158,10 +158,24 @@ func TestHashLiteral(t *testing.T) {
 			},
 		},
 		{
+			"{1.5: 2.5, 2.5: 3.5}",
+			map[object.HashKey]float64{
+				(&object.Float{Value: 1.5}).HashKey(): 2.5,
+				(&object.Float{Value: 2.5}).HashKey(): 3.5,
+			},
+		},
+		{
 			"{1 + 1: 2 * 2, 3 + 3: 4 * 4}",
 			map[object.HashKey]int64{
 				(&object.Integer{Value: 2}).HashKey(): 4,
 				(&object.Integer{Value: 6}).HashKey(): 16,
+			},
+		},
+		{
+			"{1.5 + 1.5: 2.5 * 2.0, 3.5 + 3.5: 4.5 * 4.0}",
+			map[object.HashKey]float64{
+				(&object.Float{Value: 3.0}).HashKey(): 5.0,
+				(&object.Float{Value: 7.0}).HashKey(): 18.0,
 			},
 		},
 	}
@@ -672,6 +686,31 @@ func testExpectedObject(t *testing.T, expected interface{}, actual object.Object
 			}
 
 			err := testIntegerObject(expectedValue, pair.Value)
+			if err != nil {
+				t.Errorf("testIntegerObject failed: %s", err)
+			}
+		}
+
+	case map[object.HashKey]float64:
+		hash, ok := actual.(*object.Hash)
+		if !ok {
+			t.Errorf("object is not Hash. got=%T (%+v)", actual, actual)
+			return
+		}
+
+		if len(hash.Pairs) != len(expected) {
+			t.Errorf("hash has wrong number of Pairs. want=%d, got=%d",
+				len(hash.Pairs), len(expected))
+			return
+		}
+
+		for expectedKey, expectedValue := range expected {
+			pair, ok := hash.Pairs[expectedKey]
+			if !ok {
+				t.Errorf("no pair for given key in Pairs")
+			}
+
+			err := testFloatObject(expectedValue, pair.Value)
 			if err != nil {
 				t.Errorf("testIntegerObject failed: %s", err)
 			}
