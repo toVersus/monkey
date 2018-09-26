@@ -138,6 +138,7 @@ func TestArrayLiterals(t *testing.T) {
 	tests := []vmTestCase{
 		{"[]", []int{}},
 		{"[1, 2, 3]", []int{1, 2, 3}},
+		{"[1.5, 2, 3.5]", []float64{1.5, 2, 3.5}},
 		{"[1 + 2, 3 * 4, 5 + 6]", []int{3, 12, 11}},
 	}
 
